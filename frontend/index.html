@@ -1,1 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API 規格書產生器</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f8f8;
+      margin: 0;
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background-color: white;
+      padding: 2rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+    label.title-label {
+      font-weight: bold;
+      margin-top: 1.5rem;
+      display: block;
+    }
+
+    .file-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .file-label {
+      padding: 6px 12px;
+      background-color: #007bff;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .file-name {
+      font-size: 0.9rem;
+      color: #333;
+      flex: 1;
+      word-break: break-all;
+    }
+
+    button {
+      margin-top: 2rem;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #output {
+      margin-top: 2rem;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📄 API 規格書產生器</h1>
+    <form id="uploadForm">
+
+      <label class="title-label" for="excel">📊 上傳 Excel 資料檔案 (.xlsx)</label>
+      <div class="file-row">
+        <label for="excel" class="file-label">選擇檔案</label>
+        <span id="excel-name" class="file-name">尚未選擇檔案</span>
+        <input type="file" id="excel" class="file-input" name="excel_file" accept=".xlsx" required>
+      </div>
+
+      <label class="title-label" for="template">📄 上傳 Word 範本 (.docx)</label>
+      <div class="file-row">
+        <label for="template" class="file-label">選擇檔案</label>
+        <span id="template-name" class="file-name">尚未選擇檔案</span>
+        <input type="file" id="template" class="file-input" name="word_template" accept=".docx" required>
+      </div>
+
+      <label class="title-label" for="sql">📁 上傳 SQL 設定檔 (.properties)</label>
+      <div class="file-row">
+        <label for="sql" class="file-label">選擇檔案</label>
+        <span id="sql-name" class="file-name">尚未選擇檔案</span>
+        <input type="file" id="sql" class="file-input" name="sql_properties" accept=".properties" required>
+      </div>
+
+      <button type="submit">🚀 產生 API 規格書</button>
+    </form>
+
+    <div id="output"></div>
+  </div>
+
+  <script>
+    // 顯示檔名
+    document.getElementById('excel').addEventListener('change', function () {
+      const file = this.files[0];
+      document.getElementById('excel-name').textContent = file ? file.name : '尚未選擇檔案';
+    });
+
+    document.getElementById('template').addEventListener('change', function () {
+      const file = this.files[0];
+      document.getElementById('template-name').textContent = file ? file.name : '尚未選擇檔案';
+    });
+
+    document.getElementById('sql').addEventListener('change', function () {
+      const file = this.files[0];
+      document.getElementById('sql-name').textContent = file ? file.name : '尚未選擇檔案';
+    });
+
+    const form = document.getElementById('uploadForm');
+    const output = document.getElementById('output');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+
+      output.textContent = '⏳ 處理中，請稍候...';
+
+      try {
+        const response = await fetch('/upload/', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error('產生失敗，請確認檔案格式是否正確');
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'API_規格書.docx';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        output.textContent = '✅ 成功產生並下載 API 規格書';
+      } catch (error) {
+        output.textContent = `❌ 錯誤：${error.message}`;
+      }
+    });
+  </script>
+</body>
+</html>
 
