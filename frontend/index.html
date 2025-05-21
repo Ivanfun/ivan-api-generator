@@ -4,160 +4,224 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>API 規格書產生器</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f8f8f8;
-      margin: 0;
-      padding: 2rem;
+      font-family: 'Noto Sans TC', sans-serif;
+      background-color: #f0f4f8;
     }
-    h1 {
-      text-align: center;
-      color: #333;
-    }
-    .container {
-      max-width: 800px;
-      margin: auto;
-      background-color: white;
-      padding: 2rem;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      border-radius: 8px;
-    }
-    label.title-label {
-      font-weight: bold;
-      margin-top: 1.5rem;
-      display: block;
-    }
-
-    .file-row {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-top: 0.5rem;
-    }
-
     .file-input {
       display: none;
     }
-
-    .file-label {
-      padding: 6px 12px;
-      background-color: #007bff;
-      color: white;
-      border-radius: 4px;
-      cursor: pointer;
-      white-space: nowrap;
+    .progress-bar {
+      transition: width 0.3s ease;
     }
-
-    .file-name {
-      font-size: 0.9rem;
-      color: #333;
-      flex: 1;
-      word-break: break-all;
+    .animate-bounce-slow {
+      animation: bounce 1.5s infinite;
     }
-
-    button {
-      margin-top: 2rem;
-      padding: 0.75rem 1.5rem;
-      font-size: 1rem;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-
-    #output {
-      margin-top: 2rem;
-      color: green;
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(-5%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+      }
+      50% {
+        transform: translateY(0);
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+      }
     }
   </style>
 </head>
-<body>
-  <div class="container">
-    <h1>📄 API 規格書產生器</h1>
-    <form id="uploadForm">
-
-      <label class="title-label" for="excel">📊 上傳 Excel 資料檔案 (.xlsx)</label>
-      <div class="file-row">
-        <label for="excel" class="file-label">選擇檔案</label>
-        <span id="excel-name" class="file-name">尚未選擇檔案</span>
-        <input type="file" id="excel" class="file-input" name="excel_file" accept=".xlsx" required>
+<body class="min-h-screen py-8 px-4 sm:px-6">
+  <div class="max-w-3xl mx-auto">
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+      <div class="bg-gradient-to-r from-blue-600 to-blue-800 px-6 py-8 text-white">
+        <div class="flex items-center justify-center space-x-3">
+          <div class="text-4xl animate-bounce-slow">📄</div>
+          <h1 class="text-2xl sm:text-3xl font-bold">API 規格書產生器</h1>
+        </div>
+        <p class="mt-2 text-center text-blue-100">上傳必要檔案，快速產生標準化 API 文件</p>
       </div>
+      <div class="p-6 sm:p-8">
+        <form id="uploadForm" class="space-y-6">
+          <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+            <label class="block text-lg font-medium text-blue-800 mb-3" for="excel">
+              <span class="flex items-center">
+                <span class="text-xl mr-2">📊</span>
+                上傳 Excel 資料檔案
+              </span>
+            </label>
+            <div class="flex items-center">
+              <label for="excel" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md cursor-pointer">
+                選擇檔案
+              </label>
+              <span id="excel-name" class="ml-3 text-sm text-gray-600 truncate">尚未選擇檔案</span>
+              <input type="file" id="excel" class="file-input" name="excel_file" accept=".xlsx" required>
+            </div>
+            <p class="mt-2 text-xs text-gray-500">支援 .xlsx 格式</p>
+          </div>
 
-      <label class="title-label" for="template">📄 上傳 Word 範本 (.docx)</label>
-      <div class="file-row">
-        <label for="template" class="file-label">選擇檔案</label>
-        <span id="template-name" class="file-name">尚未選擇檔案</span>
-        <input type="file" id="template" class="file-input" name="word_template" accept=".docx" required>
+          <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
+            <label class="block text-lg font-medium text-indigo-800 mb-3" for="template">
+              <span class="flex items-center">
+                <span class="text-xl mr-2">📄</span>
+                上傳 Word 範本
+              </span>
+            </label>
+            <div class="flex items-center">
+              <label for="template" class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md cursor-pointer">
+                選擇檔案
+              </label>
+              <span id="template-name" class="ml-3 text-sm text-gray-600 truncate">尚未選擇檔案</span>
+              <input type="file" id="template" class="file-input" name="word_template" accept=".docx" required>
+            </div>
+            <p class="mt-2 text-xs text-gray-500">支援 .docx 格式</p>
+          </div>
+
+          <div class="bg-purple-50 p-4 rounded-lg border border-purple-100">
+            <label class="block text-lg font-medium text-purple-800 mb-3" for="sql">
+              <span class="flex items-center">
+                <span class="text-xl mr-2">📁</span>
+                上傳 SQL 設定檔
+              </span>
+            </label>
+            <div class="flex items-center">
+              <label for="sql" class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-md cursor-pointer">
+                選擇檔案
+              </label>
+              <span id="sql-name" class="ml-3 text-sm text-gray-600 truncate">尚未選擇檔案</span>
+              <input type="file" id="sql" class="file-input" name="sql_properties" accept=".properties" required>
+            </div>
+            <p class="mt-2 text-xs text-gray-500">支援 .properties 格式</p>
+          </div>
+
+          <div class="flex justify-center pt-4">
+            <button type="submit" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-800 text-white text-lg font-semibold rounded-lg shadow-md hover:from-blue-700 hover:to-blue-900 transition duration-300">
+              產生 API 規格書
+            </button>
+          </div>
+        </form>
+
+        <div id="processing" class="mt-8 hidden">
+          <div class="text-center mb-4">
+            <div class="inline-block p-4 bg-blue-100 rounded-full animate-spin text-blue-600">⏳</div>
+            <h3 class="mt-2 text-lg font-medium text-gray-900">處理中，請稍候...</h3>
+            <p class="mt-1 text-sm text-gray-500">正在產生您的 API 規格書</p>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div id="progress-bar" class="progress-bar bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div id="result" class="mt-8 hidden">
+          <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+            <div class="flex">
+              <div class="flex-shrink-0">✅</div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-green-800">產生成功！</h3>
+                <p class="mt-2 text-sm text-green-700">您的 API 規格書已準備就緒，請點擊下方按鈕下載。</p>
+                <div class="mt-4">
+                  <a id="download-link" href="#" class="bg-green-600 px-4 py-2 rounded-md text-sm font-medium text-white hover:bg-green-700 transition">下載文件</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="error" class="mt-8 hidden">
+          <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div class="flex">
+              <div class="flex-shrink-0">❌</div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-red-800">處理失敗</h3>
+                <p id="error-message" class="mt-2 text-sm text-red-700">產生失敗，請確認檔案格式是否正確。</p>
+                <div class="mt-4">
+                  <button id="try-again" type="button" class="bg-red-600 px-4 py-2 rounded-md text-sm font-medium text-white hover:bg-red-700 transition">重新嘗試</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 text-center text-sm text-gray-500">
+          <p>© 2025 API 規格書產生器 ｜ 版本 1.0.0</p>
+        </div>
       </div>
-
-      <label class="title-label" for="sql">📁 上傳 SQL 設定檔 (.properties)</label>
-      <div class="file-row">
-        <label for="sql" class="file-label">選擇檔案</label>
-        <span id="sql-name" class="file-name">尚未選擇檔案</span>
-        <input type="file" id="sql" class="file-input" name="sql_properties" accept=".properties" required>
-      </div>
-
-      <button type="submit">🚀 產生 API 規格書</button>
-    </form>
-
-    <div id="output"></div>
+    </div>
   </div>
 
   <script>
     // 顯示檔名
-    document.getElementById('excel').addEventListener('change', function () {
-      const file = this.files[0];
-      document.getElementById('excel-name').textContent = file ? file.name : '尚未選擇檔案';
-    });
-
-    document.getElementById('template').addEventListener('change', function () {
-      const file = this.files[0];
-      document.getElementById('template-name').textContent = file ? file.name : '尚未選擇檔案';
-    });
-
-    document.getElementById('sql').addEventListener('change', function () {
-      const file = this.files[0];
-      document.getElementById('sql-name').textContent = file ? file.name : '尚未選擇檔案';
+    ['excel', 'template', 'sql'].forEach(id => {
+      document.getElementById(id).addEventListener('change', function () {
+        const file = this.files[0];
+        document.getElementById(`${id}-name`).textContent = file ? file.name : '尚未選擇檔案';
+      });
     });
 
     const form = document.getElementById('uploadForm');
-    const output = document.getElementById('output');
+    const processing = document.getElementById('processing');
+    const result = document.getElementById('result');
+    const error = document.getElementById('error');
+    const progressBar = document.getElementById('progress-bar');
+    const downloadLink = document.getElementById('download-link');
+    const errorMessage = document.getElementById('error-message');
+    const tryAgainBtn = document.getElementById('try-again');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      form.classList.add('hidden');
+      processing.classList.remove('hidden');
+      result.classList.add('hidden');
+      error.classList.add('hidden');
+
+      let progress = 0;
+      const progressInterval = setInterval(() => {
+        progress += Math.random() * 15;
+        if (progress > 90) progress = 90;
+        progressBar.style.width = `${progress}%`;
+      }, 500);
+
       const formData = new FormData(form);
 
-      output.textContent = '⏳ 處理中，請稍候...';
-
       try {
+        await new Promise(resolve => setTimeout(resolve, 2000));
         const response = await fetch('/upload/', {
           method: 'POST',
           body: formData
         });
 
-        if (!response.ok) {
-          throw new Error('產生失敗，請確認檔案格式是否正確');
-        }
+        clearInterval(progressInterval);
+        progressBar.style.width = '100%';
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        if (!response.ok) throw new Error('產生失敗，請確認檔案格式是否正確');
 
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'API_規格書.docx';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        output.textContent = '✅ 成功產生並下載 API 規格書';
-      } catch (error) {
-        output.textContent = `❌ 錯誤：${error.message}`;
+        downloadLink.href = url;
+        downloadLink.download = 'API規格書.docx';
+        processing.classList.add('hidden');
+        result.classList.remove('hidden');
+      } catch (err) {
+        clearInterval(progressInterval);
+        errorMessage.textContent = err.message;
+        processing.classList.add('hidden');
+        error.classList.remove('hidden');
+      }
+    });
+
+    tryAgainBtn.addEventListener('click', () => {
+      error.classList.add('hidden');
+      form.classList.remove('hidden');
+    });
+
+    downloadLink.addEventListener('click', (e) => {
+      if (downloadLink.href === window.location.href + '#') {
+        e.preventDefault();
+        alert('這是一個示範版本，實際下載功能需要後端支援。');
       }
     });
   </script>
 </body>
 </html>
-
